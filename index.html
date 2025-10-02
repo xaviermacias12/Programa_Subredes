@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Subredes IP</title>
+    <style>
+        /* ===== ESTILOS GENERALES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        /* ===== CONTENEDOR PRINCIPAL ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        /* ===== ENCABEZADO ===== */
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .content {
+            padding: 40px;
+        }
+
+        /* ===== PANEL DE ENTRADA ===== */
+        .input-panel {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 25px;
+            align-items: flex-start;
+        }
+
+        /* ===== GRUPOS DE ENTRADA ===== */
+        .input-group {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .input-hint {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        /* ===== BOTÓN DE CÁLCULO ===== */
+        .button-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        /* ===== MENSAJES DE ERROR ===== */
+        .error-message {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            display: none;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* ===== PANEL DE RESULTADOS ===== */
+        .results-panel {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+
+        .results-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        /* ===== TABLA DE RESULTADOS ===== */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .results-table th {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #bdc3c7;
+        }
+
+        .results-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .results-table tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        /* ===== INFORMACIÓN DE LA RED ===== */
+        .network-info {
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* ===== PIE DE PÁGINA ===== */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #ecf0f1;
+            color: #7f8c8d;
+            margin-top: 30px;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            .input-panel {
+                padding: 20px;
+            }
+            .input-row {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .input-group {
+                min-width: auto;
+            }
+            .results-table {
+                font-size: 0.9em;
+            }
+            .results-table th,
+            .results-table td {
+                padding: 10px 8px;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Calculadora de Subredes IP</h1>
+        </div>
+        
+        <div class="content">
+            <!-- PANEL DE ENTRADA DE DATOS -->
+            <div class="input-panel">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="ipAddress">Dirección de Red (con o sin CIDR)</label>
+                        <input type="text" id="ipAddress" placeholder="Ej: 192.168.10.0/24 o 192.168.10.0">
+                        <div class="input-hint">Formato: XXX.XXX.XXX.XXX/XX (donde XX es 1-30) o solo la dirección IP</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="subnetCount">Número de Subredes</label>
+                        <input type="number" id="subnetCount" placeholder="Ej: 4" min="1" max="256">
+                        <div class="input-hint">Mínimo: 1, Máximo: 256 subredes</div>
+                    </div>
+                </div>
+                
+                <div class="button-container">
+                    <button class="calculate-btn" onclick="calcularSubredes()">
+                        Generar Subredes
+                    </button>
+                </div>
+            </div>
+            
+            <!-- MENSAJES DE ERROR -->
+            <div id="errorMessage" class="error-message"></div>
+            
+            <!-- SECCIÓN DE RESULTADOS (inicialmente oculta) -->
+            <div id="resultsSection" class="results-panel">
+                <!-- INFORMACIÓN GENERAL DE LA RED -->
+                <div class="network-info">
+                    <h3>Información de la Red</h3>
+                    <div class="info-grid" id="networkInfo">
+                        <!-- La información de la red se insertará aquí dinámicamente -->
+                    </div>
+                </div>
+                
+                <!-- TABLA DE SUBNETES GENERADAS -->
+                <div class="results-header">
+                    <h2>Resultados de las Subredes</h2>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Dirección de Red</th>
+                                <th>Rango de Hosts Usables</th>
+                                <th>Dirección Broadcast</th>
+                                <th>Máscara de Subred</th>
+                                <th>Hosts Disponibles</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Las filas de subredes se insertarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>2025 Calculadora de Subredes IP - Luis Xavier Macias Flores</p>
+        </div>
+    </div>
+
+    <script>
+    // =============================================
+    // FUNCIONES PRINCIPALES DE LA CALCULADORA
+    // =============================================
+
+    /**
+     * FUNCIÓN PRINCIPAL - Calcula y muestra las subredes
+     * Esta función coordina todo el proceso de cálculo:
+     * 1. Obtiene los valores de entrada
+     * 2. Valida los datos
+     * 3. Realiza los cálculos de subnetting
+     * 4. Muestra los resultados en la interfaz
+     */
+    function calcularSubredes() {
+        // Obtener referencias a los elementos del DOM
+        const ipInput = document.getElementById('ipAddress');
+        const countInput = document.getElementById('subnetCount');
+        const errorDiv = document.getElementById('errorMessage');
+        const resultsSection = document.getElementById('resultsSection');
+        const tableBody = document.getElementById('tableBody');
+        const networkInfo = document.getElementById('networkInfo');
+        
+        // Obtener y limpiar los valores de entrada
+        const ipAddress = ipInput.value.trim();
+        const subnetCount = parseInt(countInput.value);
+        
+        // Limpiar resultados anteriores y ocultar errores
+        errorDiv.style.display = 'none';
+        tableBody.innerHTML = '';
+        networkInfo.innerHTML = '';
+        resultsSection.style.display = 'none';
+        
+        // Validar las entradas del usuario
+        if (!validarEntradas(ipAddress, subnetCount, errorDiv)) {
+            return; // Detener ejecución si hay errores
+        }
+        
+        // Realizar cálculos de subnetting
+        const resultados = realizarCalculos(ipAddress, subnetCount, errorDiv);
+        
+        // Si los cálculos fueron exitosos, mostrar resultados
+        if (resultados) {
+            mostrarResultados(resultados, tableBody, networkInfo, resultsSection);
+        }
+    }
+    
+    /**
+     * VALIDACIÓN DE ENTRADAS - Verifica que los datos sean correctos
+     * @param {string} ipAddress - Dirección IP ingresada por el usuario
+     * @param {number} subnetCount - Número de subredes solicitadas
+     * @param {HTMLElement} errorDiv - Elemento para mostrar mensajes de error
+     * @returns {boolean} - True si las entradas son válidas, False si hay errores
+     */
+    function validarEntradas(ipAddress, subnetCount, errorDiv) {
+        // Verificar que ambos campos estén completos
+        if (!ipAddress || isNaN(subnetCount)) {
+            mostrarError('Por favor, complete todos los campos correctamente.', errorDiv);
+            return false;
+        }
+        
+        // Expresión regular para validar formato de IP (con o sin CIDR)
+        // Acepta: 192.168.1.0/24 o 192.168.1.0
+        const ipRegex = /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/;
+        if (!ipRegex.test(ipAddress)) {
+            mostrarError('Formato incorrecto. Use: XXX.XXX.XXX.XXX/XX (ej: 192.168.1.0/24) o solo la IP (ej: 192.168.1.0)', errorDiv);
+            return false;
+        }
+        
+        // Validar que el número de subredes esté en el rango permitido
+        if (subnetCount < 1 || subnetCount > 256) {
+            mostrarError('El número de subredes debe estar entre 1 y 256.', errorDiv);
+            return false;
+        }
+        
+        // Separar la IP del CIDR (si existe)
+        const partes = ipAddress.split('/');
+        const ip = partes[0];
+        const cidr = partes.length > 1 ? parseInt(partes[1]) : null;
+        
+        // Validar cada octeto de la dirección IP
+        const octetos = ip.split('.');
+        for (let i = 0; i < 4; i++) {
+            const octeto = parseInt(octetos[i]);
+            // Cada octeto debe estar entre 0 y 255
+            if (octeto < 0 || octeto > 255) {
+                mostrarError('La dirección IP contiene valores inválidos. Cada octeto debe estar entre 0-255.', errorDiv);
+                return false;
+            }
+        }
+        
+        // Validar el CIDR si fue proporcionado
+        if (cidr !== null && (cidr < 1 || cidr > 30)) {
+            mostrarError('El valor CIDR debe estar entre 1 y 30.', errorDiv);
+            return false;
+        }
+        
+        // Si todas las validaciones pasan, retornar true
+        return true;
+    }
+    
+    /**
+     * MOSTRAR ERROR - Muestra mensajes de error en la interfaz
+     * @param {string} mensaje - Texto del mensaje de error
+     * @param {HTMLElement} errorDiv - Elemento donde mostrar el error
+     */
+    function mostrarError(mensaje, errorDiv) {
+        errorDiv.textContent = mensaje;
+        errorDiv.style.display = 'block';
+    }
+    
+    /**
+     * DETERMINAR CIDR POR DEFECTO - Asigna CIDR basado en la clase de la IP
+     * @param {string} ip - Dirección IP sin CIDR
+     * @returns {number} - Valor CIDR por defecto según la clase de la IP
+     * 
+     * Clases de IP:
+     * - Clase A: 1.0.0.0 a 126.255.255.255 (CIDR /8)
+     * - Clase B: 128.0.0.0 a 191.255.255.255 (CIDR /16)
+     * - Clase C: 192.0.0.0 a 223.255.255.255 (CIDR /24)
+     */
+    function determinarCIDRPorDefecto(ip) {
+        const primerOcteto = parseInt(ip.split('.')[0]);
+        
+        if (primerOcteto >= 1 && primerOcteto <= 126) {
+            return 8;  // Clase A - Máscara 255.0.0.0
+        } else if (primerOcteto >= 128 && primerOcteto <= 191) {
+            return 16; // Clase B - Máscara 255.255.0.0
+        } else if (primerOcteto >= 192 && primerOcteto <= 223) {
+            return 24; // Clase C - Máscara 255.255.255.0
+        } else {
+            return 24; // Por defecto para otras clases (D y E)
+        }
+    }
+    
+    /**
+     * REALIZAR CÁLCULOS - Función principal de cálculo de subredes
+     * @param {string} ipAddress - Dirección IP con o sin CIDR
+     * @param {number} subnetCount - Número de subredes a crear
+     * @param {HTMLElement} errorDiv - Elemento para mostrar errores
+     * @returns {Object|null} - Objeto con resultados o null si hay error
+     */
+    function realizarCalculos(ipAddress, subnetCount, errorDiv) {
+        try {
+            // Separar la IP del CIDR
+            const partes = ipAddress.split('/');
+            const ip = partes[0];
+            let cidr = partes.length > 1 ? parseInt(partes[1]) : null;
+            
+            // Si no se proporcionó CIDR, determinar uno por defecto
+            if (cidr === null) {
+                cidr = determinarCIDRPorDefecto(ip);
+            }
+            
+            // Convertir la IP a array de números
+            const octetos = ip.split('.').map(Number);
+            
+            // CÁLCULO 1: Determinar bits necesarios para las subredes
+            // Ej: Para 4 subredes necesitamos 2 bits (2^2 = 4)
+            const bitsNecesarios = Math.ceil(Math.log2(subnetCount));
+            
+            // CÁLCULO 2: Calcular el nuevo CIDR (prefijo extendido)
+            const nuevoCidr = cidr + bitsNecesarios;
+            
+            // Validar que el nuevo CIDR no exceda el límite técnico
+            // CIDR máximo es 30 porque necesitamos al menos 2 hosts por subred
+            if (nuevoCidr > 30) {
+                mostrarError(`No es posible crear ${subnetCount} subredes con una máscara /${cidr}.`, errorDiv);
+                return null;
+            }
+            
+            // CÁLCULO 3: Calcular máscaras de subred
+            const mascaraOriginal = calcularMascara(cidr);
+            const mascaraNueva = calcularMascara(nuevoCidr);
+            
+            // CÁLCULO 4: Calcular hosts disponibles por subred
+            const bitsHost = 32 - nuevoCidr; // Bits disponibles para hosts
+            const hostsPorSubred = Math.pow(2, bitsHost); // Total de direcciones
+            const hostsDisponibles = hostsPorSubred - 2; // Restar red y broadcast
+            
+            // CÁLCULO 5: Calcular el tamaño de cada subred en la red original
+            const tamañoSubred = Math.pow(2, 32 - cidr) / subnetCount;
+            
+            // CÁLCULO 6: Calcular dirección de red original
+            const direccionRedOriginal = calcularDireccionRed(octetos, cidr, 0, tamañoSubred);
+            
+            // GENERAR LAS SUBNETES SOLICITADAS
+            const subredes = [];
+            
+            for (let i = 0; i < subnetCount; i++) {
+                // Calcular dirección de red para esta subred
+                const direccionRed = calcularDireccionRed(octetos, cidr, i, tamañoSubred);
+                
+                // Calcular primera IP usable (red + 1)
+                const primerHost = incrementarIP(direccionRed, 1);
+                
+                // Calcular última IP usable (broadcast - 1)
+                const ultimoHost = incrementarIP(direccionRed, hostsPorSubred - 2);
+                
+                // Calcular dirección de broadcast
+                const broadcast = incrementarIP(direccionRed, hostsPorSubred - 1);
+                
+                // Agregar subred al array de resultados
+                subredes.push({
+                    numero: i + 1,
+                    red: direccionRed,
+                    redStr: direccionRed.join('.') + '/' + nuevoCidr,
+                    primerHost: primerHost.join('.'),
+                    ultimoHost: ultimoHost.join('.'),
+                    broadcast: broadcast.join('.'),
+                    mascara: mascaraNueva.join('.'),
+                    hostsDisponibles: hostsDisponibles
+                });
+            }
+            
+            // INFORMACIÓN ADICIONAL DE LA RED ORIGINAL
+            const broadcastOriginal = calcularBroadcastOriginal(octetos, cidr);
+            const primerHostOriginal = incrementarIP(direccionRedOriginal, 1);
+            const ultimoHostOriginal = incrementarIP(direccionRedOriginal, Math.pow(2, 32 - cidr) - 2);
+            
+            // Retornar objeto con todos los resultados
+            return {
+                subredes: subredes,
+                infoRed: {
+                    direccionOriginal: ip,
+                    cidrOriginal: cidr,
+                    cidrNuevo: nuevoCidr,
+                    mascaraOriginal: mascaraOriginal.join('.'),
+                    mascaraNueva: mascaraNueva.join('.'),
+                    direccionRedOriginal: direccionRedOriginal.join('.'),
+                    broadcastOriginal: broadcastOriginal.join('.'),
+                    primerHostOriginal: primerHostOriginal.join('.'),
+                    ultimoHostOriginal: ultimoHostOriginal.join('.'),
+                    hostsPorSubred: hostsDisponibles,
+                    totalHosts: hostsDisponibles * subnetCount
+                }
+            };
+            
+        } catch (error) {
+            // Capturar y mostrar cualquier error inesperado
+            mostrarError('Error en los cálculos: ' + error.message, errorDiv);
+            return null;
+        }
+    }
+    
+    /**
+     * CALCULAR MÁSCARA - Convierte CIDR a máscara de subred
+     * @param {number} cidr - Valor CIDR (1-30)
+     * @returns {Array} - Máscara de subred como array [255, 255, 255, 0]
+     * 
+     * Ejemplo: CIDR 24 -> 255.255.255.0
+     * Lógica: Para cada octeto, calcular cuántos bits están en 1
+     */
+    function calcularMascara(cidr) {
+        const mascara = [0, 0, 0, 0];
+        
+        // Procesar cada octeto de la máscara
+        for (let i = 0; i < 4; i++) {
+            // Calcular bits en 1 para este octeto
+            const bits = Math.min(8, Math.max(0, cidr - i * 8));
+            if (bits > 0) {
+                // Calcular valor del octeto: 2^bits - 1 desplazado
+                mascara[i] = 256 - Math.pow(2, 8 - bits);
+            }
+        }
+        return mascara;
+    }
+    
+    /**
+     * CALCULAR DIRECCIÓN DE RED - Determina la dirección de red para una subred
+     * @param {Array} octetos - IP como [192, 168, 1, 0]
+     * @param {number} cidr - CIDR original
+     * @param {number} indiceSubred - Índice de la subred (0-based)
+     * @param {number} tamañoSubred - Tamaño de cada subred en direcciones
+     * @returns {Array} - Dirección de red de la subred
+     */
+    function calcularDireccionRed(octetos, cidr, indiceSubred, tamañoSubred) {
+        // Convertir IP a número decimal de 32 bits
+        const ipDecimal = (octetos[0] << 24) + (octetos[1] << 16) + (octetos[2] << 8) + octetos[3];
+        
+        // Calcular dirección de red: IP + (índice * tamaño subred)
+        const redDecimal = ipDecimal + (indiceSubred * tamañoSubred);
+        
+        // Convertir de vuelta a formato IP (4 octetos)
+        return [
+            (redDecimal >>> 24) & 255,     // Primer octeto
+            (redDecimal >>> 16) & 255,     // Segundo octeto
+            (redDecimal >>> 8) & 255,      // Tercer octeto
+            redDecimal & 255               // Cuarto octeto
+        ];
+    }
+    
+    /**
+     * CALCULAR BROADCAST ORIGINAL - Dirección de broadcast de la red original
+     * @param {Array} octetos - IP original
+     * @param {number} cidr - CIDR original
+     * @returns {Array} - Dirección de broadcast
+     */
+    function calcularBroadcastOriginal(octetos, cidr) {
+        const mascara = calcularMascara(cidr);
+        
+        // Convertir IP y máscara a números decimales
+        const ipDecimal = (octetos[0] << 24) + (octetos[1] << 16) + (octetos[2] << 8) + octetos[3];
+        const mascaraDecimal = (mascara[0] << 24) + (mascara[1] << 16) + (mascara[2] << 8) + mascara[3];
+        
+        // Broadcast = (IP AND Máscara) OR (NOT Máscara)
+        const redDecimal = ipDecimal & mascaraDecimal;
+        const broadcastDecimal = redDecimal | (~mascaraDecimal >>> 0);
+        
+        // Convertir a formato IP
+        return [
+            (broadcastDecimal >>> 24) & 255,
+            (broadcastDecimal >>> 16) & 255,
+            (broadcastDecimal >>> 8) & 255,
+            broadcastDecimal & 255
+        ];
+    }
+    
+    /**
+     * INCREMENTAR IP - Suma un valor a una dirección IP
+     * @param {Array} ipArray - IP como [192, 168, 1, 0]
+     * @param {number} incremento - Valor a sumar
+     * @returns {Array} - Nueva IP incrementada
+     */
+    function incrementarIP(ipArray, incremento) {
+        // Crear copia del array para no modificar el original
+        const nuevaIP = [...ipArray];
+        let acarreo = incremento;
+        
+        // Sumar comenzando por el último octeto (derecha a izquierda)
+        for (let i = 3; i >= 0; i--) {
+            nuevaIP[i] += acarreo;
+            acarreo = Math.floor(nuevaIP[i] / 256); // Calcular acarreo para siguiente octeto
+            nuevaIP[i] %= 256; // Mantener en rango 0-255
+        }
+        
+        return nuevaIP;
+    }
+    
+    /**
+     * MOSTRAR RESULTADOS - Actualiza la interfaz con los resultados calculados
+     * @param {Object} resultados - Objeto con subredes e información de red
+     * @param {HTMLElement} tableBody - Elemento tbody de la tabla
+     * @param {HTMLElement} networkInfo - Elemento para información de red
+     * @param {HTMLElement} resultsSection - Sección completa de resultados
+     */
+    function mostrarResultados(resultados, tableBody, networkInfo, resultsSection) {
+        const { subredes, infoRed } = resultados;
+        
+        // ACTUALIZAR INFORMACIÓN GENERAL DE LA RED
+        networkInfo.innerHTML = `
+            <div class="info-item">
+                <div class="info-label">Dirección de Red Original</div>
+                <div class="info-value">${infoRed.direccionOriginal}/${infoRed.cidrOriginal}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Máscara Original</div>
+                <div class="info-value">${infoRed.mascaraOriginal}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Nueva Máscara</div>
+                <div class="info-value">${infoRed.mascaraNueva} (/${infoRed.cidrNuevo})</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Hosts por Subred</div>
+                <div class="info-value">${infoRed.hostsPorSubred}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Total de Hosts</div>
+                <div class="info-value">${infoRed.totalHosts}</div>
+            </div>
+        `;
+        
+        // LIMPIAR Y ACTUALIZAR TABLA DE SUBNETES
+        tableBody.innerHTML = '';
+        
+        // Crear una fila por cada subred calculada
+        subredes.forEach(subred => {
+            const fila = document.createElement('tr');
+            
+            // Insertar datos de la subred en la fila
+            fila.innerHTML = `
+                <td><strong>${subred.numero}</strong></td>
+                <td><code>${subred.redStr}</code></td>
+                <td><code>${subred.primerHost} - ${subred.ultimoHost}</code></td>
+                <td><code>${subred.broadcast}</code></td>
+                <td><code>${subred.mascara}</code></td>
+                <td><strong>${subred.hostsDisponibles}</strong></td>
+            `;
+            
+            // Agregar fila a la tabla
+            tableBody.appendChild(fila);
+        });
+        
+        // MOSTRAR SECCIÓN DE RESULTADOS
+        resultsSection.style.display = 'block';
+        
+        // Desplazamiento suave hacia los resultados
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // =============================================
+    // CONFIGURACIÓN DE EVENTOS
+    // =============================================
+    
+    /**
+     * CONFIGURACIÓN INICIAL - Se ejecuta cuando el DOM está cargado
+     * Configura los event listeners para la tecla Enter
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seleccionar todos los campos de entrada
+        const inputs = document.querySelectorAll('input');
+        
+        // Agregar event listener para cada input
+        inputs.forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                // Si se presiona Enter, ejecutar cálculo
+                if (e.key === 'Enter') {
+                    calcularSubredes();
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>
